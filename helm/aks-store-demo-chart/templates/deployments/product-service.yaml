@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-service
+  template:
+    metadata:
+      labels:
+        app: product-service
+    spec:
+      serviceAccountName: aks-store-demo-user
+      containers:
+      - name: product-service
+        image: "{{ .Values.productService.image.repository }}:product-service-{{ .Values.productService.image.tag }}"
+        ports:
+        - containerPort: 3002
+        resources:
+          requests:
+            cpu: 1m
+            memory: 1Mi
+          limits:
+            cpu: 2m
+            memory: 20Mi

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: order-service-configs
+data:  
+  ORDER_QUEUE_PORT: "5672"
+  ORDER_QUEUE_HOSTNAME: "rabbitmq.{{ .Release.Namespace }}.svc.cluster.local:5672"
+  ORDER_QUEUE_USERNAME: "{{ .Values.orderService.queueUsername }}"
+  ORDER_QUEUE_PASSWORD: "{{ .Values.orderService.queuePassword }}"
+  ORDER_QUEUE_NAME: "orders"
+  FASTIFY_ADDRESS: "0.0.0.0"

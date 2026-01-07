@@ -1,0 +1,61 @@
+services:
+  store-front:
+    image: node:22.14-alpine
+    container_name: "store-front"
+    restart: always
+    environment:
+      - VITE_PRODUCT_SERVICE_URL=http://product-service:3002
+      - VITE_ORDER_SERVICE_URL=http://order-service:3000
+    ports:
+      - 8080:8080
+    depends_on:
+      - product-service
+      - order-service
+    volumes:
+      - ./src/store-front:/app
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+
+  product-service:
+    image: rust:1.82-bullseye
+    container_name: "product-service"
+    restart: always
+    ports:
+      - 3002:3002
+    volumes:
+      - ./src/product-service:/app
+    working_dir: /app
+    command: sh -c "cargo run"
+
+  order-service:
+    image: node:22.14-alpine
+    container_name: "order-service"
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - ORDER_QUEUE_HOSTNAME=rabbitmq
+      - ORDER_QUEUE_PORT=5672
+      - ORDER_QUEUE_USERNAME=username
+      - ORDER_QUEUE_PASSWORD=password
+      - ORDER_QUEUE_NAME=orders
+      - ORDER_QUEUE_RECONNECT_LIMIT=3
+    volumes:
+      - ./src/order-service:/app
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: rabbitmq:3.13.2-management-alpine
+    container_name: "rabbitmq"
+    restart: always
+    environment:
+      - "RABBITMQ_DEFAULT_USER=username"
+      - "RABBITMQ_DEFAULT_PASS=password"
+    ports:
+      - 15672:15672
+      - 5672:5672
+    volumes:
+      - ./rabbitmq_enabled_plugins:/etc/rabbitmq/enabled_plugins

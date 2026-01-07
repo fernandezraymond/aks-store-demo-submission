@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order-service
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      serviceAccountName: aks-store-demo-user
+      containers:
+      - name: order-service
+        image: "{{ .Values.orderService.image.repository }}:order-service-{{ .Values.orderService.image.tag }}"
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: order-service-configs
+        resources:
+          requests:
+            cpu: 1m
+            memory: 50Mi
+          limits:
+            cpu: 75m
+            memory: 128Mi
+      initContainers:
+      - name: wait-for-rabbitmq
+        image: busybox:1.37.0
+        command: ['sh', '-c', 'until nc -zv rabbitmq 5672; do echo waiting for rabbitmq; sleep 2; done;']
+        resources:
+          requests:
+            cpu: 1m
+            memory: 50Mi
+          limits:
+            cpu: 75m
+            memory: 128Mi

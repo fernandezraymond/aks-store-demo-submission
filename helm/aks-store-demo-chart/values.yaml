@@ -1,0 +1,23 @@
+image:
+  credentials:
+    username: ""
+    password: ""
+    registry: ""
+    email: ""
+
+orderService:
+  image:
+    repository: "fernandezraymondc/aks-store-demo"
+    tag: ""
+  queueUsername: "userorder"
+  queuePassword: "password"
+
+productService:
+  image:
+    repository: "fernandezraymondc/aks-store-demo"
+    tag: ""
+
+storeFront:
+  image:
+    repository: "fernandezraymondc/aks-store-demo"
+    tag: ""
